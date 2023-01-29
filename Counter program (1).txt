@@ -1,0 +1,94 @@
+Counter program
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".MainActivity">
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/counter_id"
+    />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="start"
+        android:id="@+id/btn_start"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="stop"
+        android:id="@+id/btn_stop"/>
+
+
+</LinearLayout>
+
+package com.example.counter;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.os.Handler;
+import android.widget.EditText;
+import android.widget.Button;
+import android.widget.TextView;
+import android.os.Message;
+
+public class MainActivity extends  AppCompatActivity implements View.OnClickListener,Runnable {
+    Button start,stop;
+    EditText ed1;
+    TextView display;
+    int i=0;
+    Boolean running=false;
+    Thread thread;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        display=findViewById(R.id.counter_id);
+        start=findViewById(R.id.btn_start);
+        stop=findViewById(R.id.btn_stop);
+        start.setOnClickListener(this);
+        stop.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.equals(start)){
+            running = true;
+            thread= new Thread(this);
+            thread.start();
+        }
+        else if (v.equals(stop)){
+            thread.interrupt();
+            running=false;
+        }
+    }
+    Handler hand=new Handler()
+    {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            display.setText(""+msg.what);
+        }
+    };
+    @Override
+    public void run() {
+        while(i<100 && running){
+            try {
+                thread.sleep(1000);
+            }
+            catch (Exception e){
+                System.out.println(e);
+            }
+            hand.sendEmptyMessage(i);
+            i++;
+        }
+    }
+}
